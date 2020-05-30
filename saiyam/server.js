@@ -137,10 +137,10 @@ app.post('/', singleupload,urlencodedParser, function (req, res) {
     let newUser = new User();
     newUser.name = req.body.name;
     newUser.regno = req.body.regno;
-    newUser.regcert = req.file.filename;
-    newUser.cert12a =req.file.filename;
-    newUser.cert80g =req.file.filename;
-    newUser.fcra = req.file.filename;
+    // newUser.regcert = req.file.filename;
+    // newUser.cert12a =req.file.filename;
+    // newUser.cert80g =req.file.filename;
+    // newUser.fcra = req.file.filename;
     newUser.acname = req.body.acname;
     newUser.acno = req.body.acno;
     newUser.ifsccode = req.body.ifsccode;
@@ -156,7 +156,6 @@ app.post('/', singleupload,urlencodedParser, function (req, res) {
             console.log(err, 'error')
             return
         }
-        res.redirect('/success')
 
     });
 })
