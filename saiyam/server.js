@@ -57,22 +57,22 @@ const UserSchema = new Schema({
     regcert:{
         type: String,
         default: "/default.png",
-        required: true
+        // required: true
     },
     cert12a:{
         type: String,
         default: "/default.png",
-        required: true
+        // required: true
     },
     cert80g:{
         type: String,
         default: "/default.png",
-        required: true
+        // required: true
     },
     fcra:{
         type: String,
         default: "/default.png",
-        required: true
+        // required: true
     },
     acname:{
         type: String,
