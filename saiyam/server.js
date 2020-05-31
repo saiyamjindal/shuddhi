@@ -149,7 +149,8 @@ app.post('/', singleupload,urlencodedParser, function (req, res) {
     newUser.phno = req.body.phno;
     newUser.email = req.body.email;
     newUser.password = req.body.password;
-    newUser.description = req.body.description;
+    newUser.confirmPassword = req.body.confirmPassword;
+    // newUser.description = req.body.description;
 
     newUser.save(function (err) {
         if (err) {
