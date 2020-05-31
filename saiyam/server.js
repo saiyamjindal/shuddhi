@@ -8,7 +8,7 @@ var fs = require('fs')
 var path = require('path')
 const mongoose = require('mongoose');
 mongoose
-  .connect("mongodb+srv://shuddhi:shuddhi@cluster0-kdlho.mongodb.net/test?retryWrites=true&w=majority", {
+  .connect('mongodb://localhost:27017/newdb', {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -128,7 +128,7 @@ const NgoSchema = new Schema({
     }
 });
 
-const Ngo = mongoose.model('User', NgoSchema);
+const Ngo = mongoose.model('Ngo', NgoSchema);
 
 app.get('/', function (req, res) {
     res.render('register')
@@ -151,15 +151,13 @@ app.post('/', singleupload,urlencodedParser, function (req, res) {
     newUser.password = req.body.password;
     newUser.confirmPassword = req.body.confirmPassword;
     // newUser.description = req.body.description;
-
+        console.log("Hello");
     newUser.save(function (err) {
         if (err) {
             console.log(err, 'error')
             return
         }
-        else{
-            console.log("Hello");
-        }
+        
     });
 })
 
