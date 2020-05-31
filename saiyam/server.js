@@ -1,4 +1,4 @@
-const MONGO_DB ="mongodb+srv://creativeprotocol:creativeprotocol@cluster0-kdlho.mongodb.net/test?authSource=admin&replicaSet=Cluster0-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=true"; 
+// const MONGO_DB ="mongodb+srv://creativeprotocol:shuddhi@cluster0-kdlho.mongodb.net/test?authSource=admin&replicaSet=Cluster0-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=true"; 
 // const SK = process.env.SK;
 var express = require('express')
 var app = express()
@@ -8,14 +8,14 @@ var fs = require('fs')
 var path = require('path')
 const mongoose = require('mongoose');
 mongoose
-  .connect("mongodb+srv://creativeprotocol:creativeprotocol@cluster0-kdlho.mongodb.net/test?retryWrites=true&w=majority", {
+  .connect("mongodb+srv://shuddhi:shuddhi@cluster0-kdlho.mongodb.net/test?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
   })
   .then(function (db) {
     // console.log(db);
-    console.log("userDB connected");
+    console.log("ngodb connected");
   })
   .catch(function (err) {
     console.log(err);
@@ -47,7 +47,7 @@ app.use(express.static(__dirname + '/public'));
  app.use(bodyParser.json());
 
 
-const UserSchema = new Schema({
+const NgoSchema = new Schema({
     name: String,
     regno : {
         type: Number,
@@ -128,7 +128,7 @@ const UserSchema = new Schema({
     }
 });
 
-const User = mongoose.model('User', UserSchema);
+const Ngo = mongoose.model('User', NgoSchema);
 
 app.get('/', function (req, res) {
     res.render('register')
@@ -157,7 +157,9 @@ app.post('/', singleupload,urlencodedParser, function (req, res) {
             console.log(err, 'error')
             return
         }
-
+        else{
+            console.log("Hello");
+        }
     });
 })
 
