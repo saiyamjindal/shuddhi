@@ -139,7 +139,7 @@ body {
   </head>
   <body>
     <!-- multistep form -->
-<form id="msform" method="post" enctype="multipart/form-data">
+<form id="msform" action="/" method="post" enctype="multipart/form-data">
   <!-- progressbar -->
   <ul id="progressbar">
     <li class="active">NGO Details</li>
@@ -152,7 +152,8 @@ body {
     <h2 class="fs-title">Create Your Account</h2>
     <h3 class="fs-subtitle">This is step 1</h3>
     <input type="text" name="name" placeholder="Name of NGO" />
-    <input type="number" name="regno" placeholder="Registration Number" />
+	<input type="number" name="regno" placeholder="Registration Number" />
+	<input type="text" name="description" placeholder="Description" />
     <input type="password" name="password" placeholder="Password" />
     <input type="password" name="confirmPassword" placeholder="Confirm Password" />
     <input type="button" name="next" class="next action-button" value="Next" />

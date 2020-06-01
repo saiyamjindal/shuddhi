@@ -31,12 +31,12 @@ var bodyParser = require("body-parser")
 var multer= require('multer')
 
 var storage = multer.diskStorage({
-   destination: "./public/uploads/",
+   destination: "./public/uploads",
    filename: (req,file,cb)=>{
        cb(null,file.fieldname+"_"+Date.now()+path.extname(file.originalname));
    }
 });
-var singleupload = multer({ storage: storage }).single('file')
+var singleupload = multer({ storage: storage }).any();
 
 // var jsonParser = bodyParser.json()
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
@@ -54,59 +54,52 @@ const NgoSchema = new Schema({
         unique: true,
         required: true
     },
-    regcert:{
-        type: String,
-        default: "/default.png",
-        // required: true
-    },
-    cert12a:{
-        type: String,
-        default: "/default.png",
-        // required: true
-    },
-    cert80g:{
-        type: String,
-        default: "/default.png",
-        // required: true
-    },
-    fcra:{
-        type: String,
-        default: "/default.png",
-        // required: true
-    },
+    // regcert:{
+    //     type: String,
+    //     default: "/default.png",
+    //     // required: true
+    // },
+    // cert12a:{
+    //     type: String,
+    //     default: "/default.png",
+    //     // required: true
+    // },
+    // cert80g:{
+    //     type: String,
+    //     default: "/default.png",
+    //     // required: true
+    // },
+    // fcra:{
+    //     type: String,
+    //     default: "/default.png",
+    //     // required: true
+    // },
     acname:{
         type: String,
-        unique: true,
         required: true
     },
     acno: {
         type: Number,
-        unique: true,
         required: true
     },
     ifsccode:{
         type: String,
-        unique: true,
         required: true
     },
     bankadd:{
         type: String,
-        unique: true,
         required: true
     },
     authperson:{
         type: String,
-        unique: true,
         required: true
     },
     phno:{
         type: Number,
-        unique: true,
         required: true
     },
     email: {
         type: String,
-        unique: true,
         required:true
     },
     password: {
@@ -122,9 +115,7 @@ const NgoSchema = new Schema({
         required: true,
       },
       description:{
-        type: String,
-        unique: true,
-        required:true
+        type: String
     }
 });
 
@@ -133,26 +124,27 @@ const Ngo = mongoose.model('Ngo', NgoSchema);
 app.get('/', function (req, res) {
     res.render('register')
 })
-app.post('/', singleupload,urlencodedParser, function (req, res) {
-    let newUser = new User();
-    newUser.name = req.body.name;
-    newUser.regno = req.body.regno;
-    newUser.regcert = req.file.filename;
-    newUser.cert12a =req.file.filename;
-    newUser.cert80g =req.file.filename;
-    newUser.fcra = req.file.filename;
-    newUser.acname = req.body.acname;
-    newUser.acno = req.body.acno;
-    newUser.ifsccode = req.body.ifsccode;
-    newUser.bankadd = req.body.bankadd;
-    newUser.authperson = req.body.authperson;
-    newUser.phno = req.body.phno;
-    newUser.email = req.body.email;
-    newUser.password = req.body.password;
-    newUser.confirmPassword = req.body.confirmPassword;
-    // newUser.description = req.body.description;
+app.post('/', singleupload , urlencodedParser, function (req, res) {
+    let newNgo = new Ngo();
+    newNgo.name = req.body.name;
+    newNgo.regno = req.body.regno;
+    // newNgo.regcert = req.files;
+    // newNgo.cert12a =req.files;
+    // newNgo.cert80g =req.files;
+    // newNgo.fcra = req.files;
+    newNgo.acname = req.body.acname;
+    newNgo.acno = req.body.acno;
+    newNgo.ifsccode = req.body.ifsccode;
+    newNgo.bankadd = req.body.bankadd;
+    newNgo.authperson = req.body.authperson;
+    newNgo.phno = req.body.phno;
+    newNgo.email = req.body.email;
+    newNgo.password = req.body.password;
+    newNgo.confirmPassword = req.body.confirmPassword;
+    newNgo.description = req.body.description;
+    // newNgo.description = req.body.description;
         console.log("Hello");
-    newUser.save(function (err) {
+    newNgo.save(function (err) {
         if (err) {
             console.log(err, 'error')
             return
