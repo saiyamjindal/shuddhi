@@ -60,11 +60,10 @@ const upload = multer({
     name: "cert12a", maxCount: 1    
   }]);
 
-  async function uploadFile(req, res,next) {
+  async function uploadFile(req, res, next) {
     try {
       // 
-      console.log(req.files);
-      await sharp(req.files.regcert[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
+        await sharp(req.files.regcert[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
         quality: 90
       }).toFile(`public/final/regcert.jpeg`)
       // cover
@@ -157,7 +156,7 @@ const NgoSchema = new Schema({
         required: true,
         select: false,
       },
-      confirmPassword: {
+    confirmPassword: {
         type: String,
         validate: function () {
           return this.password == this.confirmPassword;
@@ -193,7 +192,7 @@ app.post('/', multiImageHandler, uploadFile, urlencodedParser, function (req, re
     newNgo.confirmPassword = req.body.confirmPassword;
     newNgo.description = req.body.description;
     // newNgo.description = req.body.description;
-        console.log("req.files");
+    console.log("req.files");
     newNgo.save(function (err) {
         if (err) {
             console.log(err, 'error')
