@@ -58,7 +58,14 @@ const upload = multer({
     name: "regcert", maxCount: 1
   }, {
     name: "cert12a", maxCount: 1    
-  }]);
+  },
+  {
+    name: "cert80g", maxCount: 1
+  },
+  {
+    name: "fcra", maxCount: 1
+  }
+]);
 
   async function uploadFile(req, res, next) {
     try {
@@ -71,6 +78,14 @@ const upload = multer({
       await sharp(req.files.cert12a[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
         quality: 90
       }).toFile(`public/final/cert12a.jpeg`)
+
+      await sharp(req.files.cert80g[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
+        quality: 90
+      }).toFile(`public/final/cert80g.jpeg`)
+
+      await sharp(req.files.fcra[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
+        quality: 90
+      }).toFile(`public/final/fcra.jpeg`)
   
       console.log("will reach after processing every image");
       res.status(200).json({
@@ -100,60 +115,48 @@ const NgoSchema = new Schema({
     name: String,
     regno : {
         type: Number,
-        unique: true,
-        required: true
+        unique: true
     },
     regcert:{
         type: String,
-        default: "./default.png",
-        // required: true
+        default: "./default.png"
     },
     cert12a:{
         type: String,
-        default: "./default.png",
-        // required: true
+        default: "./default.png"
     },
-    // cert80g:{
-    //     type: String,
-    //     default: "/default.png",
-    //     // required: true
-    // },
-    // fcra:{
-    //     type: String,
-    //     default: "/default.png",
-    //     // required: true
-    // },
-    acname:{
+    cert80g:{
         type: String,
-        required: true
+        default: "/default.png"
+    },
+    fcra:{
+        type: String,
+        default: "/default.png"
+    },
+    acname:{
+        type: String
     },
     acno: {
-        type: Number,
-        required: true
+        type: Number
     },
     ifsccode:{
-        type: String,
-        required: true
+        type: String
     },
     bankadd:{
-        type: String,
-        required: true
+        type: String
     },
     authperson:{
-        type: String,
-        required: true
+        type: String
     },
     phno:{
-        type: Number,
-        required: true
+        type: Number
     },
     email: {
         type: String,
-        required:true
+        // required:true
     },
     password: {
         type: String,
-        required: true,
         select: false,
       },
     confirmPassword: {
@@ -161,7 +164,6 @@ const NgoSchema = new Schema({
         validate: function () {
           return this.password == this.confirmPassword;
         },
-        required: true,
       },
       description:{
         type: String
@@ -173,14 +175,14 @@ const Ngo = mongoose.model('Ngo', NgoSchema);
 app.get('/', function (req, res) {
     res.render('trial')
 })
-app.post('/', multiImageHandler, uploadFile, urlencodedParser, function (req, res) {
+app.post('/', multiImageHandler, uploadFile,urlencodedParser, function (req, res) {
     let newNgo = new Ngo();
     newNgo.name = req.body.name;
     newNgo.regno = req.body.regno;
     newNgo.regcert = req.files.regcert[0].path;
     newNgo.cert12a =req.files.cert12a[0].path;
-    // newNgo.cert80g =req.files;
-    // newNgo.fcra = req.files;
+    newNgo.cert80g =req.files.cert80g[0].path;
+    newNgo.fcra = req.files.fcra[0].path;
     newNgo.acname = req.body.acname;
     newNgo.acno = req.body.acno;
     newNgo.ifsccode = req.body.ifsccode;
@@ -192,7 +194,8 @@ app.post('/', multiImageHandler, uploadFile, urlencodedParser, function (req, re
     newNgo.confirmPassword = req.body.confirmPassword;
     newNgo.description = req.body.description;
     // newNgo.description = req.body.description;
-    console.log("req.files");
+    console.log("Hello guys");
+    console.log(req.files);
     newNgo.save(function (err) {
         if (err) {
             console.log(err, 'error')
