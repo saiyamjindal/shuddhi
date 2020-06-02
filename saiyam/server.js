@@ -6,6 +6,7 @@ app.set("view engine", "ejs")
 app.use(express.static('public'))
 var fs = require('fs')
 var path = require('path')
+const sharp = require("sharp");
 const mongoose = require('mongoose');
 mongoose
   .connect('mongodb://localhost:27017/newdb', {
@@ -29,16 +30,62 @@ const url = require('url');
 
 var bodyParser = require("body-parser")
 var multer= require('multer')
+// var singleupload = multer({ storage: storage });
 
-var storage = multer.diskStorage({
-   destination: "./public/uploads",
-   filename: (req,file,cb)=>{
-       cb(null,file.fieldname+"_"+Date.now()+path.extname(file.originalname));
-   }
-});
-var singleupload = multer({ storage: storage }).any();
+const filter = function (req, file, cb) {
+    if (file.mimetype.startsWith("image")) {
+      cb(null, true)
+    } else {
+      cb(new Error("Not an Image! Please upload an image"), false)
+    }
+}
 
-// var jsonParser = bodyParser.json()
+const multerStorage = multer.diskStorage({  
+        destination: function (req, file, cb) {
+          cb(null, "public/raw")
+        },
+        filename: function (req, file, cb) {
+      
+          cb(null, `user-${Date.now()}.jpeg`)
+        }
+      })
+
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: filter
+  })
+  let multiImageHandler = upload.fields([{
+    name: "regcert", maxCount: 1
+  }, {
+    name: "cert12a", maxCount: 1    
+  }]);
+
+  async function uploadFile(req, res,next) {
+    try {
+      // 
+      console.log(req.files);
+      await sharp(req.files.regcert[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
+        quality: 90
+      }).toFile(`public/final/regcert.jpeg`)
+      // cover
+      // start
+      await sharp(req.files.cert12a[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
+        quality: 90
+      }).toFile(`public/final/cert12a.jpeg`)
+  
+      console.log("will reach after processing every image");
+      res.status(200).json({
+        status: "data uploaded successfully"
+      })
+      next();
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
+
+
+
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.use(session({ secret: 'keyboard cat', cookie: { maxAge: 1160000 } }))
 const secret = 'abcdefg';
@@ -54,16 +101,16 @@ const NgoSchema = new Schema({
         unique: true,
         required: true
     },
-    // regcert:{
-    //     type: String,
-    //     default: "/default.png",
-    //     // required: true
-    // },
-    // cert12a:{
-    //     type: String,
-    //     default: "/default.png",
-    //     // required: true
-    // },
+    regcert:{
+        type: String,
+        default: "/default.png",
+        // required: true
+    },
+    cert12a:{
+        type: String,
+        default: "/default.png",
+        // required: true
+    },
     // cert80g:{
     //     type: String,
     //     default: "/default.png",
@@ -122,14 +169,14 @@ const NgoSchema = new Schema({
 const Ngo = mongoose.model('Ngo', NgoSchema);
 
 app.get('/', function (req, res) {
-    res.render('register')
+    res.render('trial')
 })
-app.post('/', singleupload , urlencodedParser, function (req, res) {
+app.post('/', multiImageHandler, uploadFile, urlencodedParser, function (req, res) {
     let newNgo = new Ngo();
     newNgo.name = req.body.name;
     newNgo.regno = req.body.regno;
-    // newNgo.regcert = req.files;
-    // newNgo.cert12a =req.files;
+    newNgo.regcert = req.files.regcert[0].path;
+    newNgo.cert12a =req.files.cert12a[0].path;
     // newNgo.cert80g =req.files;
     // newNgo.fcra = req.files;
     newNgo.acname = req.body.acname;
@@ -143,7 +190,7 @@ app.post('/', singleupload , urlencodedParser, function (req, res) {
     newNgo.confirmPassword = req.body.confirmPassword;
     newNgo.description = req.body.description;
     // newNgo.description = req.body.description;
-        console.log("Hello");
+        console.log("req.files");
     newNgo.save(function (err) {
         if (err) {
             console.log(err, 'error')
@@ -157,37 +204,4 @@ app.post('/', singleupload , urlencodedParser, function (req, res) {
 const port =3000;
 app.listen(port, function () {
     console.log("Server has started at port 3000");
-  });
-
-
-
-//   module.exports.updateProfileImage = async function updateProfileImage(req, res) {
-//     // update anything
-//     //  form data 
-//     try {
-//       // console.log(req.file);
-//       let serverPath = `public/img/users/user-${Date.now()}.jpeg`
-//       // process
-//       console.log("I was here");
-//       await sharp(req.file.path)
-//         .resize(200, 200)
-//         .toFormat("jpeg")
-//         .jpeg({ quality: 90 })
-//         .toFile(serverPath);
-//       serverPath = serverPath.split("/").slice(1).join("/");
-      
-//       let user = await userModel.findById(req.id);
-      
-//       user.profileImage = serverPath;
-  
-//       await user.save({ validateBeforeSave: false });
-//       // console.log("I was here");
-//       res.status(200).json({
-//         status: "image uploaded"
-//       })
-//     } catch (err) {
-//       console.log(err);
-//       console.log(err.message);
-//     }
-//   }
-  
+  })

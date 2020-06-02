@@ -17,7 +17,7 @@ const filter = function (req, file, cb) {
   }
 }
 //storageFilter => file=> jpg,destination
-const multerStorage = multer.diskStorage({
+const multerStorage = multer.diskStorage({  
   destination: function (req, file, cb) {
     cb(null, "public/raw")
   },
