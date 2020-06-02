@@ -8,10 +8,29 @@ var fs = require('fs')
 var path = require('path')
 var session = require('express-session')
 var _ = require("lodash")
+const mongoose = require('mongoose');
+var sharp = require('sharp');
+
+const Schema = mongoose.Schema;
+
 
 var bodyParser = require("body-parser")
 var multer= require('multer')
 // var singleupload = multer({ storage: storage });
+mongoose
+.connect('mongodb://localhost:27017/newdb', {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+})
+.then(function (db) {
+  // console.log(db);
+  console.log("ngodb connected");
+})
+.catch(function (err) {
+  console.log(err);
+});
+
 
 const filter = function (req, file, cb) {
     if (file.mimetype.startsWith("image")) {
@@ -87,12 +106,12 @@ const NgoSchema = new Schema({
     },
     regcert:{
         type: String,
-        default: "/default.png",
+        default: "./default.png",
         // required: true
     },
     cert12a:{
         type: String,
-        default: "/default.png",
+        default: "./default.png",
         // required: true
     },
     // cert80g:{
@@ -189,7 +208,4 @@ const port =3000;
 app.listen(port, function () {
     console.log("Server has started at port 3000");
   })
-const port =3000;
-app.listen(port, function () {
-    console.log("Server has started at port 3000");
-  });
+
