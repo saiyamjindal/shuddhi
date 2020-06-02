@@ -6,6 +6,7 @@ app.set("view engine", "ejs")
 app.use(express.static('public'))
 var fs = require('fs')
 var path = require('path')
+<<<<<<< HEAD
 const sharp = require("sharp");
 const mongoose = require('mongoose');
 mongoose
@@ -21,13 +22,13 @@ mongoose
   .catch(function (err) {
     console.log(err);
 });
+=======
+
+>>>>>>> 0af23c39558d5db11c3335bcd33dab47f7d4569e
 var session = require('express-session')
 var _ = require("lodash")
-const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
-const crypto = require('crypto');
-const url = require('url');
 
+<<<<<<< HEAD
 var bodyParser = require("body-parser")
 var multer= require('multer')
 // var singleupload = multer({ storage: storage });
@@ -87,12 +88,18 @@ const upload = multer({
 
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
+=======
+
+var bodyParser = require("body-parser")
+
+>>>>>>> 0af23c39558d5db11c3335bcd33dab47f7d4569e
 app.use(session({ secret: 'keyboard cat', cookie: { maxAge: 1160000 } }))
 const secret = 'abcdefg';
 
 app.use(express.static(__dirname + '/public'));
  app.use(bodyParser.json());
 
+<<<<<<< HEAD
 
 const NgoSchema = new Schema({
     name: String,
@@ -205,3 +212,9 @@ const port =3000;
 app.listen(port, function () {
     console.log("Server has started at port 3000");
   })
+=======
+const port =3000;
+app.listen(port, function () {
+    console.log("Server has started at port 3000");
+  });
+>>>>>>> 0af23c39558d5db11c3335bcd33dab47f7d4569e
