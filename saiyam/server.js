@@ -198,7 +198,7 @@ app.post('/', multiImageHandler, uploadFile,urlencodedParser, function (req, res
     console.log(req.files);
     newNgo.save(function (err) {
         if (err) {
-            console.log(err, 'error')
+            console.log(err.message);
             return
         }
         
