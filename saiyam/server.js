@@ -193,7 +193,6 @@ app.post('/', multiImageHandler, uploadFile,urlencodedParser, function (req, res
     newNgo.password = req.body.password;
     newNgo.confirmPassword = req.body.confirmPassword;
     newNgo.description = req.body.description;
-    // newNgo.description = req.body.description;
     console.log("Hello guys");
     console.log(req.files);
     newNgo.save(function (err) {
