@@ -72,20 +72,20 @@ const upload = multer({
       // 
         await sharp(req.files.regcert[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
         quality: 90
-      }).toFile(`public/final/regcert.jpeg`)
+      })
       // cover
       // start
       await sharp(req.files.cert12a[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
         quality: 90
-      }).toFile(`public/final/cert12a.jpeg`)
+      })
 
       await sharp(req.files.cert80g[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
         quality: 90
-      }).toFile(`public/final/cert80g.jpeg`)
+      })
 
       await sharp(req.files.fcra[0].path).resize(2000, 1500).toFormat("jpeg").jpeg({
         quality: 90
-      }).toFile(`public/final/fcra.jpeg`)
+      })
   
       console.log("will reach after processing every image");
       res.status(200).json({
