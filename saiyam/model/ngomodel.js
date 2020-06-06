@@ -1,92 +1,58 @@
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
-const crypto = require('crypto');
-const url = require('url');
-
-
-mongoose
-  .connect('mongodb://localhost:27017/newdb', {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-  })
-  .then(function (db) {
-    // console.log(db);
-    console.log("ngodb connected");
-  })
-  .catch(function (err) {
-    console.log(err);
-});
-
-
-const NgoSchema = new Schema({
+const NgoSchema = new mongoose.Schema({
     name: String,
     regno : {
         type: Number,
-        unique: true,
-        required: true
+        unique: true
     },
     regcert:{
         type: String,
-        default: "/default.png",
-        // required: true
+        default: "./default.png"
     },
     cert12a:{
         type: String,
-        default: "/default.png",
-        // required: true
+        default: "./default.png"
     },
     cert80g:{
         type: String,
-        default: "/default.png",
-        // required: true
+        default: "/default.png"
     },
     fcra:{
         type: String,
-        default: "/default.png",
-        // required: true
+        default: "/default.png"
     },
     acname:{
-        type: String,
-        required: true
+        type: String
     },
     acno: {
-        type: Number,
-        required: true
+        type: Number
     },
     ifsccode:{
-        type: String,
-        required: true
+        type: String
     },
     bankadd:{
-        type: String,
-        required: true
+        type: String
     },
     authperson:{
-        type: String,
-        required: true
+        type: String
     },
     phno:{
-        type: Number,
-        required: true
+        type: Number
     },
     email: {
         type: String,
-        required:true
+        // required:true
     },
     password: {
         type: String,
-        required: true,
         select: false,
       },
-      confirmPassword: {
+    confirmPassword: {
         type: String,
         validate: function () {
           return this.password == this.confirmPassword;
         },
-        required: true,
       },
       description:{
         type: String
@@ -94,5 +60,4 @@ const NgoSchema = new Schema({
 });
 
 const Ngo = mongoose.model('Ngo', NgoSchema);
-
 module.exports = Ngo;
