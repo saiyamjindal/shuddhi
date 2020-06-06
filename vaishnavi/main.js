@@ -17,12 +17,15 @@ var storage = multer.diskStorage({
         cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname));
     }
 });
-var receiptno = 0
+const nodemailer = require('nodemailer');
 var singleupload = multer({ storage: storage }).single('file')
 var bodyParser = require("body-parser")
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 router.use(session({ secret: 'keyboard cat', cookie: { maxAge: 1160000 } }))
 const secret = 'abcdefg';
+const pdfDocument = require('pdfkit');
+const fs = require('fs');
+const doc = new pdfDocument();
 const GovSchema = new Schema({
     name: String,
     email: {
@@ -47,6 +50,13 @@ const WorkSchema = new Schema({
     postedBy: ObjectId
 })
 const Work = mongoose.model('Work', WorkSchema);
+const RecSchema = new Schema({
+    name: String,
+    email: String,
+    receipt: String
+
+})
+const Rec = mongoose.model('Rec', RecSchema);
 const UserSchema = new Schema({
     name: String,
     phno: {
@@ -151,6 +161,7 @@ const VolunteerSchema = new Schema({
     },
 })
 const Volunteer = mongoose.model('Volunteer', VolunteerSchema);
+
 /*require('./db/mongoose')
 const Member= require('./models/member')
 router.get('/members/signup',(req,res=>{
@@ -390,6 +401,7 @@ router.get('/ngo', (req, res) => {
         res.render('ngo', { ngo: docs })
     })
 })
+var ses1 = " ";
 router.post('/ngo', urlencodedParser, function (req, res) {
     User.findOne({ regid: req.body.regid }, function (err, doc) {
         if (err) {
@@ -399,12 +411,13 @@ router.post('/ngo', urlencodedParser, function (req, res) {
         }
 
         req.session.user = doc
+        ses1 = doc
         var regid = req.session.user.regid
         res.redirect('/main/form')
     })
 })
 
-
+var s = " ";
 router.post('/result', (req, res, next) => {
     console.log("merchantHosted result hit");
     console.log(req.body);
@@ -451,9 +464,68 @@ router.post('/result', (req, res, next) => {
                     throw { name: "signature missmatch", message: "there was a missmatch in signatures genereated and received" }
                 }
                 console.log("Success")
-                receiptno = receiptno + 1
-                return res.status(200).render('receipt', { data: postData, task: ses, receiptno: receiptno });
 
+                    doc.pipe(fs.createWriteStream('./public/uploads/'+postData.referenceId + '.pdf'));
+                    doc.fontSize(20)
+                    doc.text("Donor Name :" + " " + ses.name)
+                    doc.fontSize(20)
+                    doc.text("Receipt No. :" + " " + postData.referenceId)
+                    doc.fontSize(20)
+                    doc.text("Email :" + " " + ses.email)
+                    doc.fontSize(20)
+                    doc.text("Ph No. :" + " " + ses.phNum)
+                    doc.fontSize(20)
+                    doc.text("Amount :" + " " + postData.orderAmount)
+                    doc.fontSize(20)
+                    doc.text("Type of Donation :" + " " + postData.paymentMode)
+                    doc.fontSize(20)
+                    doc.text("Description :" + " " + "Donation to " + ses1.name)
+                    doc.fontSize(20)
+                    doc.text("NGO phone no. :" + " " + ses1.phno)
+
+                    doc.end()
+                    let transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: 'examstet@gmail.com',
+                            pass: '$t@t1234'
+                        }
+                    });
+                    let mailOptions = {
+                        from: 'examstet@gmail.com',
+                        to: ses.email,
+                        subject: 'Successfull Donation',
+                        text: 'Dear Donor,\n\n Thank you for your Donation.\n\n Please find your receipt enclosed. \n\nPlease visit the website for further updates.\n\nIt is an auto generated mail so please do not reply.\n\n-Regards, STET-2020\n Govt. of Sikkim',
+                        attachments: [
+                            {
+                                filename: postData.referenceId + '.pdf', path: './public/uploads/' + postData.referenceId + '.pdf'
+                            }
+                        ]
+                    };
+                    transporter.sendMail(mailOptions, function (err, data) {
+                        if (err) {
+                            console.log('Error Occurs');
+                        } else {
+                            console.log('Email Sent');
+
+
+                        }
+
+                    });
+                    let newRec = new Rec();
+                    newRec.name = ses.name;
+                    newRec.email = ses.email;
+                    newRec.receipt = postData.referenceId + '.pdf'
+                    newRec.save(function (err) {
+                        if (err) {
+                            console.log(err, 'error')
+                            return
+                        }
+                    });
+               
+                
+                
+                return res.status(200).render('receipt', { data: postData, task: ses, ngo: ses1});
 
             }
         }
@@ -504,17 +576,43 @@ router.post('/login', urlencodedParser, (req, res) => {
                     return
                 }
                 if (_.isEmpty(doc)) {
-                    res.render('login', { message: "Please check email/password" })
+                    Member.findOne({ password: req.body.password, email: req.body.email }, function (err, doc) {
+                        if (err) {
+                            console.log(err, 'error')
+                            res.redirect('/')
+                            return
+                        }
+                        if (_.isEmpty(doc)) {
+                            Volunteer.findOne({ password: req.body.password, email: req.body.email }, function (err, doc) {
+                                if (err) {
+                                    console.log(err, 'error')
+                                    res.redirect('/')
+                                    return
+                                }
+                                if (_.isEmpty(doc)) {
+                                    res.render('login', { message: "Please check email/password" })
+                                }
+                                else {
+                                    req.session.work = doc
+                                    res.redirect('/main/welcome')
+                                }
+                            })
+                        }
+                        else {
+                            req.session.work = doc
+                            res.redirect('/main/welcome')
+                        }
+                    })
                 }
                 else {
                     req.session.work = doc
-                    res.redirect('/main/login/welcome')
+                    res.redirect('/main/welcome')
                 }
             })
         }
         else {
             req.session.work = doc
-            res.redirect('/main/login/welcome')
+            res.redirect('/main/welcome')
         }
     })
 
@@ -526,14 +624,18 @@ const checkLogIn = (req, res, next) => {
         res.redirect('/404')
     }
 }
-router.get('/login/welcome', checkLogIn, (req, res, next) => {
+
+router.get('/welcome', checkLogIn, (req, res, next) => {
     Work.find({ postedBy: req.session.work._id }, (err, docs) => {
-        res.render('user', { user: req.session.work, blogs: docs })
+        Rec.find({ email: req.session.work.email }, (err, docs1) => {
+            res.render('user', { user: req.session.work, blogs: docs, recs: docs1 })
+
+        })
 
     })
 })
 
-router.post('/login/welcome', urlencodedParser, checkLogIn, (req, res) => {
+router.post('/welcome', urlencodedParser, checkLogIn, (req, res) => {
     let newWork = new Work()
     newWork.heading = req.body.heading
     newWork.content = req.body.content
@@ -545,7 +647,7 @@ router.post('/login/welcome', urlencodedParser, checkLogIn, (req, res) => {
             console.log(err, 'error')
             return
         }
-        res.redirect('/main/login/welcome')
+        res.redirect('/main/welcome')
 
     });
 
@@ -559,7 +661,7 @@ router.post('/imageupload', singleupload, urlencodedParser, checkLogIn, (req, re
             console.log(err, 'error')
             return
         }
-        res.redirect('/main/login/welcome')
+        res.redirect('/main/welcome')
     });
 })
 router.get('/logout', (req, res) => {
