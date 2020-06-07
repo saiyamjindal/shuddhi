@@ -59,5 +59,5 @@ const NgoSchema = new mongoose.Schema({
     }
 });
 
-const Ngo = mongoose.model('Ngo', NgoSchema);
-module.exports = Ngo;
+const Ngomodel = mongoose.model('Ngo', NgoSchema);
+module.exports = Ngomodel;

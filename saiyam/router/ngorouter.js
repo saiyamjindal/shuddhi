@@ -1,7 +1,7 @@
 const express = require('express');
 var app = express();
 const router= new express.Router()
-const Ngo= require('../model/ngomodel');
+const Ngomodel= require('../model/ngomodel');
 app.set("view engine", "ejs")
 app.use(express.static('public'))
 var fs = require('fs')
@@ -77,6 +77,49 @@ const upload = multer({
       console.log(err.message);
     }
   }
+// Query Helper
+
+
+class QueryHelper {
+  constructor(initialfindp, queryObj) {
+    this.query = initialfindp;
+    this.queryObj = queryObj;//q
+  }
+  filter() {
+    let myQuery = { ...this.queryObj };
+    let toExcludeFields = ["sort", "select", "limit", "page"]
+    for (let i = 0; i < toExcludeFields.length; i++) {
+      delete myQuery[toExcludeFields[i]];
+    }
+    this.query = this.query.find(myQuery);
+    // myquery => input 
+    return this;
+  }
+
+  sort() {
+    if (this.queryObj.sort) {
+      let sortString = this.queryObj.sort.split("%").join(" ");
+      this.query = this.query.sort(sortString);
+    }
+    return this;
+  }
+  select() {
+    if (this.queryObj.select) {
+      let selectString = this.queryObj.select.split("%").join(" ");
+      this.query = this.query.select(selectString);
+    }
+    return this;
+  }
+  paginate() {
+    let page = Number(this.queryObj.page) || 1;
+    let limit = Number(this.queryObj.limit) || 4;
+    const toSkip = limit * (page - 1);
+    // [10,]
+    this.query = this.query.skip(toSkip).limit(limit);
+    return this;
+  }
+}
+
 
 
   var urlencodedParser = bodyParser.urlencoded({ extended: false })
@@ -91,11 +134,11 @@ const upload = multer({
 
 
 
-  app.get('/', function (req, res) {
-    res.render('trial')
+app.get('/', function (req, res) {
+  res.render('trial')
 })
 app.post('/', multiImageHandler, uploadFile,urlencodedParser, function (req, res) {
-    let newNgo = new Ngo();
+    let newNgo = new Ngomodel();
     newNgo.name = req.body.name;
     newNgo.regno = req.body.regno;
     newNgo.regcert = req.files.regcert[0].path;
@@ -121,5 +164,26 @@ app.post('/', multiImageHandler, uploadFile,urlencodedParser, function (req, res
         }
         
     });
+})
+app.get("/getallngo", async function(req,res){
+  const ngolist = await Ngomodel.find('ngo',{ngo:docs})
+  res.status(200).json({
+        status: "all ngos recieved",
+        data: ngolist,
+      });
+
+  // try {
+  //   // 
+  //   let willGetAllElementsPromise = new QueryHelper(Ngomodel.find(), req.query);
+  //   // pageElements = filteredElements.slice(toSkip, toSkip + limit);
+  //   let filteredElements = willGetAllElementsPromise.filter().sort().select().paginate();
+  //   let finalans = await filteredElements.query;
+  //   res.status(200).json({
+  //     status: "all Elements recieved",
+  //     data: finalans,
+  //   });
+  // } catch (err) {
+  //   console.log(err.message);
+  // }
 })
 module.exports = app;
