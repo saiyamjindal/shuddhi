@@ -35,15 +35,6 @@ app.use('/main',main);
 app.use('/merchantHosted',merchantHosted);
 
 
-/*
-app.get('/index/index' , (req, res, next)=>{
-    console.log("index get hit");
-    res.render('index',{
-        appId: config.appId, 
-        secretKey: config.secretKey, 
-        postUrl: config.paths[config.enviornment].cashfreePayUrl});
-});
-*/
 
 
 app.post('/calculateSecretKey', (req, res, next)=>{
